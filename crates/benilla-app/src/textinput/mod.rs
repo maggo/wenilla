@@ -25,6 +25,9 @@ impl Plugin for TextInputPlugin {
         // Held for the whole run: on X11 dropping the handle clears the clipboard. `NonSend`: no
         // backend is `Sync`, and NSPasteboard is main-thread-only.
         app.init_non_send_resource::<HostClipboard>();
+        // The paste chord has to be caught before winit sees its first keydown.
+        #[cfg(target_arch = "wasm32")]
+        clipboard::web::install();
     }
 }
 
@@ -96,7 +99,11 @@ pub(crate) fn feed_key(
         return FieldKey::Passthrough;
     }
     let name = crate::bindings::chord::key_token(ev.key_code, layout);
-    if let Some(chord) = chord(ev.key_code, name, mods, cfg!(target_os = "macos")) {
+    #[cfg(not(target_arch = "wasm32"))]
+    let mac = cfg!(target_os = "macos");
+    #[cfg(target_arch = "wasm32")]
+    let mac = keymap::mac_host();
+    if let Some(chord) = chord(ev.key_code, name, mods, mac) {
         match chord {
             Chord::Edit(action) => {
                 field.apply(action);

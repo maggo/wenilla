@@ -138,6 +138,14 @@ web-sys = { version = "0.3", features = [
     "AudioBuffer",
     "BaseAudioContext",
     "OfflineAudioContext",
+    # `textinput::clipboard::web`: the paste event and `navigator.clipboard`.
+    "Navigator",
+    "Clipboard",
+    "ClipboardEvent",
+    "DataTransfer",
+    "KeyboardEvent",
+    "KeyboardEventInit",
+    "Element",
 ] }
 
 # Off macOS the device layer's last hop runs over cpal (`sound::output::cpal`). macOS goes direct:

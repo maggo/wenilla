@@ -223,7 +223,10 @@ pub(super) fn feed_ui_input(
         alt,
         sup,
     };
+    #[cfg(not(target_arch = "wasm32"))]
     let mac = cfg!(target_os = "macos");
+    #[cfg(target_arch = "wasm32")]
+    let mac = keymap::mac_host();
     for ev in keyboard.read() {
         if ev.state != ButtonState::Pressed {
             continue;
