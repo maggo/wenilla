@@ -223,7 +223,7 @@ pub(super) fn feed_ui_input(
         alt,
         sup,
     };
-    let mac = cfg!(target_os = "macos");
+    let mac = keymap::mac_host();
     for ev in keyboard.read() {
         if ev.state != ButtonState::Pressed {
             continue;

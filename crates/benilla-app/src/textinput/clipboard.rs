@@ -8,6 +8,9 @@ use std::ffi::c_void;
 use bevy::prelude::*;
 use bevy::window::RawHandleWrapper;
 
+#[cfg(target_arch = "wasm32")]
+pub(crate) mod web;
+
 /// One platform pasteboard; a trait object so the Wayland half stays inside one `cfg` block.
 trait Pasteboard {
     /// The pasteboard's text; `Ok(None)` when it holds no text, `Err` for a real failure.
@@ -150,12 +153,10 @@ impl HostClipboard {
                     None
                 }
             },
-            // No pasteboard backend on web: `wayland_display` always answers `None` here (wasm32
-            // isn't in its `unix`-and-friends cfg), and the browser's own clipboard is an async,
-            // gesture-gated API (`navigator.clipboard`) this synchronous seam can't call into —
-            // the copy/cut/paste chords silently no-op rather than fail loudly.
+            // The browser's clipboard: `wayland_display` always answers `None` here (wasm32 isn't
+            // in its `unix`-and-friends cfg). See `web` for how paste reaches this synchronous seam.
             #[cfg(target_arch = "wasm32")]
-            None => None,
+            None => Some(Box::new(web::WebPasteboard)),
         };
         if let Some(backend) = &self.backend {
             info!("clipboard: {}{}", backend.name(), session_note());
