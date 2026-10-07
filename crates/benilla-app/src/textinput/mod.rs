@@ -99,7 +99,11 @@ pub(crate) fn feed_key(
         return FieldKey::Passthrough;
     }
     let name = crate::bindings::chord::key_token(ev.key_code, layout);
-    if let Some(chord) = chord(ev.key_code, name, mods, keymap::mac_host()) {
+    #[cfg(not(target_arch = "wasm32"))]
+    let mac = cfg!(target_os = "macos");
+    #[cfg(target_arch = "wasm32")]
+    let mac = keymap::mac_host();
+    if let Some(chord) = chord(ev.key_code, name, mods, mac) {
         match chord {
             Chord::Edit(action) => {
                 field.apply(action);

@@ -33,11 +33,9 @@ pub(crate) enum Chord {
 }
 
 /// Whether the host's text fields use the Mac chords; in a browser, the OS the page runs on.
+#[cfg(target_arch = "wasm32")]
 pub(crate) fn mac_host() -> bool {
-    #[cfg(target_arch = "wasm32")]
-    return super::clipboard::web::mac_host();
-    #[cfg(not(target_arch = "wasm32"))]
-    cfg!(target_os = "macos")
+    super::clipboard::web::mac_host()
 }
 
 /// What `key`, which the layout names `name`, means under `m`; `None` falls through to character
